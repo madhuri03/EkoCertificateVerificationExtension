@@ -1,6 +1,5 @@
 
 window.CaptureAPI = (function() {
-
     var MAX_PRIMARY_DIMENSION = 15000 * 2,
         MAX_SECONDARY_DIMENSION = 4000 * 2,
         MAX_AREA = MAX_PRIMARY_DIMENSION * MAX_SECONDARY_DIMENSION;
@@ -34,6 +33,7 @@ window.CaptureAPI = (function() {
 
 
     function initiateCapture(tab, callback) {
+        console.log('tab', tab)
         chrome.tabs.sendMessage(tab.id, {msg: 'scrollPage'}, function() {
             // We're done taking snapshots of all parts of the window. Display
             // the resulting full screenshot images in a new browser tab.

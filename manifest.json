@@ -1,23 +1,28 @@
 {
-  "name": "Full Page Screen Capture",
-  "version": "1.0.1",
+  "name": "Eko certificate verification",
+  "version": "1.0.0",
   "manifest_version": 2,
   "description": "Screen capture your current page in entirety and reliably!",
+  "omnibox": { "keyword" : "nt" },
   "browser_action": {
-    "default_icon": "icon-999.png",
+    "default_icon": "eko-icon.png",
     "default_popup": "popup.html"
   },
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
-        "default": "Alt+Shift+P"
+        "default": "Alt+Shift+E"
       }
     }
   },
-  "permissions": [ "activeTab", "storage", "unlimitedStorage" ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": ["tabs", "activeTab", "storage", "unlimitedStorage", "contextMenus", "https://*.blupig.net/", "http://localhost:3000/"],
   "icons": {
-    "16": "icon16-999.png",
-    "48": "icon48-999.png",
-    "128": "icon128-999.png"
+    "16": "eko-icon.png",
+    "48": "eko-icon.png",
+    "128": "eko-icon.png"
   }
 }

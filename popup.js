@@ -71,13 +71,19 @@ function _displayCapture(filenames, index) {
             resultWindowId = win.id;
         });
     } else {
-        chrome.tabs.create({
-            url: filename,
-            active: last,
-            windowId: resultWindowId,
-            openerTabId: currentTab.id,
-            index: (currentTab.incognito ? 0 : currentTab.index) + 1 + index
-        });
+        return filename;
+        // const file = filename.replace('filesystem:','');
+        // console.log('url  ss', file);
+        // $("avtar").src = file;
+        // show('avtar-form');
+
+        // chrome.tabs.create({
+        //     url: filename,
+        //     active: last,
+        //     windowId: resultWindowId,
+        //     openerTabId: currentTab.id,
+        //     index: (currentTab.incognito ? 0 : currentTab.index) + 1 + index
+        // });
     }
 
     if (!last) {
@@ -112,11 +118,74 @@ function splitnotifier() {
 //
 
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-    var tab = tabs[0];
-    currentTab = tab; // used in later calls to get tab info
-
-    var filename = getFilename(tab.url);
-
-    CaptureAPI.captureToFiles(tab, filename, displayCaptures,
-                              errorHandler, progress, splitnotifier);
+  $('open-wrap').onclick = function(element) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      var tab = tabs[0];
+      currentTab = tab; // used in later calls to get tab info
+      var filename = getFilename(tab.url);
+      show('loading');
+      hide('open-wrap');
+      let sslInfo = exposeSSL();
+      let file = CaptureAPI.captureToFiles(tab, filename, displayCaptures,
+                                errorHandler, progress, splitnotifier);
+saveCredential(sslInfo);
+    });
+  };
 });
+
+function exposeSSL() {
+  var background = chrome.extension.getBackgroundPage();
+  var currentTabId = background.currentTabId;
+  var popupData = background.popupData[currentTabId];
+  if (typeof popupData === 'undefined') return;
+
+  document.getElementById('lblValidationResult').style['background'] = popupData['result_color_hex'];
+  document.getElementById('lblValidationResult').innerHTML = popupData['validation_result'];
+  document.getElementById('lblMessage').innerHTML = popupData['message'];
+
+  // Identity
+  if (popupData["subject_organization"].length > 0) {
+    document.getElementById('lblSubjectOrganization').innerHTML = 'Organization:<br><b>' + popupData['subject_organization'] + '</b>';
+    document.getElementById('lblSubjectOrganization').style['display'] = 'block';
+  } else {
+    document.getElementById('lblSubjectOrganization').innerHTML = '';
+    document.getElementById('lblSubjectOrganization').style['display'] = 'none';
+  }
+
+  // Issuer
+  if (popupData["issuer_common_name"].length > 0) {
+    document.getElementById('pIssuer').style['display'] = 'block';
+    document.getElementById('lblIssuerOrganization').innerHTML = '<b>' + popupData['issuer_organization'] + '</b>';
+    document.getElementById('lblIssuerCommonName').innerHTML = popupData['issuer_common_name'];
+  } else {
+    document.getElementById('pIssuer').style['display'] = 'none';
+  }
+
+  return popupData;
+};
+
+function saveCredential(sslInfo) {
+  var request = new XMLHttpRequest();
+
+    var formData = new FormData();
+
+    formData.append("ssl_info", sslInfo);
+
+
+    request.open("POST", "http://localhost:3000");
+    request.send(formData);
+
+
+  request.onreadystatechange = function() {
+    // Only handle event when request is finished
+    if (request.readyState !== 4) {
+      return;
+    }
+
+    console.log('aaaaaaaaaaa');
+  };
+
+  // Make request
+  request.open('POST', 'https://localhost:3000', true);
+  request.send();
+}
