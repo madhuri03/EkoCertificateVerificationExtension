@@ -17,9 +17,9 @@
   },
   "background": {
     "scripts": ["background.js"],
-    "persistent": false
+    "persistent": true
   },
-  "permissions": ["tabs", "activeTab", "storage", "unlimitedStorage", "contextMenus", "https://*.blupig.net/", "http://localhost:3000/"],
+  "permissions": ["tabs", "activeTab", "storage", "unlimitedStorage", "contextMenus", "https://*.blupig.net/", "http://localhost:3000/*"],
   "icons": {
     "16": "eko-icon.png",
     "48": "eko-icon.png",

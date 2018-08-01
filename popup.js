@@ -172,10 +172,6 @@ function saveCredential(sslInfo) {
     formData.append("ssl_info", sslInfo);
 
 
-    request.open("POST", "http://localhost:3000");
-    request.send(formData);
-
-
   request.onreadystatechange = function() {
     // Only handle event when request is finished
     if (request.readyState !== 4) {
@@ -184,8 +180,7 @@ function saveCredential(sslInfo) {
 
     console.log('aaaaaaaaaaa');
   };
+    request.open("POST", "http://localhost:3000/v1/verify_credential");
+    request.send(formData);
 
-  // Make request
-  request.open('POST', 'https://localhost:3000', true);
-  request.send();
 }
