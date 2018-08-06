@@ -2,14 +2,26 @@
 var CAPTURE_DELAY = 150;
 
 function onMessage(data, sender, callback) {
-    if (data.msg === 'scrollPage') {
-        getPositions(callback);
-        return true;
-    } else if (data.msg == 'logMessage') {
-        console.log('[POPUP LOG]', data.data);
-    } else {
-        console.error('Unknown message received from background: ' + data.msg);
-    }
+    alert(data.msg)
+
+  switch(data.msg) {
+    case 'scrollPage':
+      getPositions(callback);
+      return true;
+      break;
+    case 'logMessage':
+      console.log('[POPUP LOG]', data.data);
+      break;
+    case 'webContent':
+      const html = document.getElementsByTagName('body')[0].innerHTML;
+      alert('wooo')
+      console.log(html)
+      callback(html);
+      break;
+    default:
+      console.error('Unknown message received from background: ' + data.msg);
+  }
+
 }
 
 if (!window.hasScreenCapturePage) {

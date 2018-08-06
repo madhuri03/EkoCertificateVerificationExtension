@@ -9,10 +9,7 @@
 var currentTab, // result of chrome.tabs.query of current active tab
     resultWindowId; // window id for putting resulting images
 
-
-//
-// Utility methods
-//
+var sslInfo, webContent, credentialFile;
 
 function $(id) { return document.getElementById(id); }
 function show(id) { $(id).style.display = 'block'; }
@@ -71,24 +68,38 @@ function _displayCapture(filenames, index) {
             resultWindowId = win.id;
         });
     } else {
-        return filename;
-        // const file = filename.replace('filesystem:','');
-        // console.log('url  ss', file);
-        // $("avtar").src = file;
-        // show('avtar-form');
+        const file = filename.replace('filesystem:','');
+        $("avtar").src = file;
+        show('avtar-form');
 
+        toDataURL(filename, function(dataUrl) {
+          credentialFile = new File(dataUrl);
+          console.log('credential file', dataUrl)
+          saveCredential();
+        })
         // chrome.tabs.create({
         //     url: filename,
-        //     active: last,
-        //     windowId: resultWindowId,
-        //     openerTabId: currentTab.id,
-        //     index: (currentTab.incognito ? 0 : currentTab.index) + 1 + index
         // });
     }
 
     if (!last) {
         _displayCapture(filenames, index + 1);
     }
+}
+
+
+function toDataURL(url, callback) {
+  var xhr = new XMLHttpRequest();
+  xhr.onload = function() {
+    var reader = new FileReader();
+    reader.onloadend = function() {
+      callback(reader.result);
+    }
+    reader.readAsDataURL(xhr.response);
+  };
+  xhr.open('GET', url);
+  xhr.responseType = 'blob';
+  xhr.send();
 }
 
 
@@ -125,10 +136,10 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       var filename = getFilename(tab.url);
       show('loading');
       hide('open-wrap');
-      let sslInfo = exposeSSL();
-      let file = CaptureAPI.captureToFiles(tab, filename, displayCaptures,
+      getWebContent(tabs[0].id);
+      exposeSSL();
+      CaptureAPI.captureToFiles(tab, filename, displayCaptures,
                                 errorHandler, progress, splitnotifier);
-saveCredential(sslInfo);
     });
   };
 });
@@ -160,16 +171,34 @@ function exposeSSL() {
   } else {
     document.getElementById('pIssuer').style['display'] = 'none';
   }
+  sslInfo = JSON.stringify(popupData);
+  console.log('exposeSSL', popupData);
 
-  return popupData;
+  saveCredential();
 };
 
-function saveCredential(sslInfo) {
+function getWebContent(tabId) {
+  alert('getWebContent')
+  chrome.tabs.sendMessage(tabId, {msg: "webContent"}, function(response) {
+    webContent = response;
+    console.log('getWebContent response', response);
+    saveCredential();
+  })
+}
+
+function saveCredential() {
+  console.log('saveCredential', sslInfo,  webContent, credentialFile)
+  if(!sslInfo || !webContent || !credentialFile)
+    return;
+
+  console.log('yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
   var request = new XMLHttpRequest();
 
     var formData = new FormData();
 
     formData.append("ssl_info", sslInfo);
+    formData.append("web_content", webContent);
+    formData.append("avtar", credentialFile);
 
 
   request.onreadystatechange = function() {
@@ -177,10 +206,9 @@ function saveCredential(sslInfo) {
     if (request.readyState !== 4) {
       return;
     }
-
-    console.log('aaaaaaaaaaa');
   };
     request.open("POST", "http://localhost:3000/v1/verify_credential");
     request.send(formData);
 
 }
+
