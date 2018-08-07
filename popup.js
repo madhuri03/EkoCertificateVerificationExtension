@@ -70,13 +70,15 @@ function _displayCapture(filenames, index) {
     } else {
         const file = filename.replace('filesystem:','');
         $("avtar").src = file;
-        show('avtar-form');
-
         toDataURL(filename, function(dataUrl) {
-          credentialFile = new File(dataUrl);
-          console.log('credential file', dataUrl)
-          saveCredential();
+          credentialFile = dataURLtoFile(dataUrl, filename);
+          var image = $("avtar");
+          image.src = credentialFile.name;
+
+          cansave();
         })
+
+
         // chrome.tabs.create({
         //     url: filename,
         // });
@@ -85,6 +87,15 @@ function _displayCapture(filenames, index) {
     if (!last) {
         _displayCapture(filenames, index + 1);
     }
+}
+
+function dataURLtoFile(dataurl, filename) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, {type:mime});
 }
 
 
@@ -118,7 +129,6 @@ function progress(complete) {
     }
 }
 
-
 function splitnotifier() {
     show('split-image');
 }
@@ -136,10 +146,12 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       var filename = getFilename(tab.url);
       show('loading');
       hide('open-wrap');
-      getWebContent(tabs[0].id);
+
       exposeSSL();
       CaptureAPI.captureToFiles(tab, filename, displayCaptures,
                                 errorHandler, progress, splitnotifier);
+      setTimeout(function(){ getWebContent(tabs[0].id); }, 3000);
+
     });
   };
 });
@@ -172,43 +184,46 @@ function exposeSSL() {
     document.getElementById('pIssuer').style['display'] = 'none';
   }
   sslInfo = JSON.stringify(popupData);
-  console.log('exposeSSL', popupData);
 
-  saveCredential();
+  cansave();
 };
 
 function getWebContent(tabId) {
-  alert('getWebContent')
   chrome.tabs.sendMessage(tabId, {msg: "webContent"}, function(response) {
     webContent = response;
-    console.log('getWebContent response', response);
-    saveCredential();
+    $('webContent').value = webContent;
+    cansave();
   })
 }
 
-function saveCredential() {
-  console.log('saveCredential', sslInfo,  webContent, credentialFile)
-  if(!sslInfo || !webContent || !credentialFile)
+function cansave() {
+  if(!sslInfo || !webContent || !credentialFile) {
     return;
+  }
 
-  console.log('yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee')
+  document.getElementById("submit_form").addEventListener("click", function (e) {
+    e.stopPropagation();
+    saveCredential();
+  });
+
+
+}
+
+function saveCredential() {
+  var formData = new FormData();
   var request = new XMLHttpRequest();
+  formData.append("avtar", credentialFile);
 
-    var formData = new FormData();
-
-    formData.append("ssl_info", sslInfo);
-    formData.append("web_content", webContent);
-    formData.append("avtar", credentialFile);
-
+  formData.append("ssl_info", sslInfo);
+  formData.append("web_content", webContent);
 
   request.onreadystatechange = function() {
     // Only handle event when request is finished
-    if (request.readyState !== 4) {
-      return;
-    }
+    // if (request.readyState !== 4) {
+    //   return;
+    // }
   };
-    request.open("POST", "http://localhost:3000/v1/verify_credential");
-    request.send(formData);
-
+  request.open("POST", "http://localhost:3000/v1/verify_credential");
+  request.send(formData);
 }
 

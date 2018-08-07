@@ -33,7 +33,7 @@ a:active { color: #000; }
     color: #888;
 }
 
-#wrap>div, #wrap>p { display: none; }
+#wrap>div, #wrap>p, #wrap>form { display: none; }
 
 #loading .loader {
     margin-top: 15px;
@@ -98,51 +98,55 @@ p { word-wrap: break-word; }
         <img src="eko-icon.png"/>
         <button class="btn btn-primary" id="confirmation-button">Capture credentials</button>
       </div>
-      <div id="wrap">
-          <p><span id="lblValidationResult" class="title-box">No HTTP(S) page loaded</span></p>
-          <p id="lblSubjectOrganization"><b></b>
-          </p>
-          <p id="pIssuer" style="display: none;">
-            <span>Issuer:</span><br />
-            <span id="lblIssuerOrganization"><b></b></span><br />
-            <span id="lblIssuerCommonName" class="text-small"></span><br />
-          </p>
-          <p><span id="lblMessage">Certificate information will display here when you open an HTTPS page.</span></p>
 
-          <div id="avtar-form">
-            <img id="avtar" src=""></img>
-          </div>
-          <div id="loading">
-              <div class="loader"><div class="bar" id="bar"></div></div>
-              <div class="clr">
-                  <br>
-                  <p>
-                      Screen capture in progress, your finished image will open in a
-                      new window once completed. Please wait for the progress bar to
-                      finish.
-                  </p>
-              </div>
-          </div>
-          <div id="split-image" class="warning">
-              Note: your page is too large for the Chrome browser to capture as
-              one image. It will be split into <span id="screenshot-count">multiple</span>
-              images.
-          </div>
-          <div id="invalid" class="error">
-              Full Page Screen Capture cannot be run on this type of URL
-              because of Google Chrome Web Store policies. Try
-              another page on the web.
-          </div>
-          <div id="uh-oh" class="error">
-              Uh oh, something went wrong! Try reloading the page,
-              verifying javascript is enabled,
-              and running this again.
-              <br><br>
-              If the problem persists, please report the error in the
-              <a href="https://chrome.google.com/webstore/support/fdpohaocaechififmbbbbbknoalclacl?hl=en&gl=US#bug">Chrome webstore</a>.
-              Please include the URL you tried it on and the
-              version of Chrome.
-          </div>
+      <div id="wrap">
+        <button id="submit_form"> submit </button>
+        <p><span id="lblValidationResult" class="title-box">No HTTP(S) page loaded</span></p>
+        <p id="lblSubjectOrganization"><b></b>
+        </p>
+        <p id="pIssuer" style="display: none;">
+          <span>Issuer:</span><br />
+          <span id="lblIssuerOrganization"><b></b></span><br />
+          <span id="lblIssuerCommonName" class="text-small"></span><br />
+        </p>
+        <p><span id="lblMessage">Certificate information will display here when you open an HTTPS page.</span></p>
+
+
+        <img id="avtar" src=""></img>
+
+        <textarea id="webContent"></textarea>
+
+        <div id="loading">
+            <div class="loader"><div class="bar" id="bar"></div></div>
+            <div class="clr">
+                <br>
+                <p>
+                    Screen capture in progress, your finished image will open in a
+                    new window once completed. Please wait for the progress bar to
+                    finish.
+                </p>
+            </div>
+        </div>
+        <div id="split-image" class="warning">
+            Note: your page is too large for the Chrome browser to capture as
+            one image. It will be split into <span id="screenshot-count">multiple</span>
+            images.
+        </div>
+        <div id="invalid" class="error">
+            Full Page Screen Capture cannot be run on this type of URL
+            because of Google Chrome Web Store policies. Try
+            another page on the web.
+        </div>
+        <div id="uh-oh" class="error">
+            Uh oh, something went wrong! Try reloading the page,
+            verifying javascript is enabled,
+            and running this again.
+            <br><br>
+            If the problem persists, please report the error in the
+            <a href="https://chrome.google.com/webstore/support/fdpohaocaechififmbbbbbknoalclacl?hl=en&gl=US#bug">Chrome webstore</a>.
+            Please include the URL you tried it on and the
+            version of Chrome.
+        </div>
       </div>
 
       <!-- JavaScript and HTML must be in separate files for security. -->

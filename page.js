@@ -2,8 +2,6 @@
 var CAPTURE_DELAY = 150;
 
 function onMessage(data, sender, callback) {
-    alert(data.msg)
-
   switch(data.msg) {
     case 'scrollPage':
       getPositions(callback);
@@ -14,7 +12,6 @@ function onMessage(data, sender, callback) {
       break;
     case 'webContent':
       const html = document.getElementsByTagName('body')[0].innerHTML;
-      alert('wooo')
       console.log(html)
       callback(html);
       break;
