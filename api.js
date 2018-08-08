@@ -9,7 +9,7 @@ window.CaptureAPI = (function() {
     // URL Matching test - to verify we can talk to this URL
     //
 
-    var matches = ['http://*/*', 'https://*/*', 'ftp://*/*', 'file://*/*'],
+    var matches = ['http://*/*', 'https://*/*'],
         noMatches = [/^https?:\/\/chrome.google.com\/.*$/];
 
     function isValidUrl(url) {
