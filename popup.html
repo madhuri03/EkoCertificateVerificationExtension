@@ -1,77 +1,77 @@
 <!DOCTYPE html>
 <html>
   <head>
-      <meta charset=utf-8>
-      <title>Full page screen catpure</title>
-      <!-- there are rendering bugs when styles aren't inline... -->
-       <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
-      <style>
-body {
-    font: normal 12px/16px helvetica,aria,sans-serif;
-}
-div,p { margin: 0; padding: 0; }
+    <meta charset=utf-8>
+    <title>Eko certificate verification</title>
+    <!-- there are rendering bugs when styles aren't inline... -->
+    <style>
+      body {
+        font: normal 12px/16px helvetica,aria,sans-serif;
+      }
+      div,p { margin: 0; padding: 0; }
 
-.clr { overflow: hidden; }
-.left { float: left; }
-.right { float: right; }
+      .clr { overflow: hidden; }
+      .left { float: left; }
+      .right { float: right; }
 
-a {
-	color: #3681b3;
-	text-decoration: none;
-}
-a:hover { color: #265c80; }
-a:active { color: #000; }
+      a {
+        color: #3681b3;
+        text-decoration: none;
+      }
+      a:hover { color: #265c80; }
+      a:active { color: #000; }
 
-#open-wrap {
-  text-align: center;
-}
+      #open-wrap {
+        text-align: center;
+      }
 
-#wrap {
-    width: 300px;
-    padding-top: 9px;
-    font-size: 12px;
-    color: #888;
-}
+      #wrap {
+        width: 300px;
+        padding-top: 9px;
+        font-size: 12px;
+        color: #888;
+      }
 
-#wrap>div, #wrap>p, #wrap>form { display: none; }
+      #wrap>div, #wrap>p, #wrap>form, #wrap>textarea, #success-msg, #failure-msg {
+        display: none;
+      }
 
-#loading .loader {
-    margin-top: 15px;
-    position: relative;
-    border-top: 12px dotted #000;
-    height: 9px;
-}
+      #loading .loader {
+        margin-top: 15px;
+        position: relative;
+        border-top: 12px dotted #000;
+        height: 9px;
+      }
 
-#loading .bar {
-    position: absolute;
-    top: -21px;
-    left: 0;
-    height: 30px;
-    width: 0%;
-    background: #fff url(loader.gif) scroll no-repeat center right;
-}
-p { word-wrap: break-word; }
+      #loading .bar {
+        position: absolute;
+        top: -21px;
+        left: 0;
+        height: 30px;
+        width: 0%;
+        background: #fff url(loader.gif) scroll no-repeat center right;
+      }
+      p { word-wrap: break-word; }
 
-.warning {
-    margin-top: 1em;
-    color: #aa8d3b;
-    font-style: italic;
-    font-weight: bold;
-}
-.error {
-    margin-top: 1em;
-    font-weight: bold;
-    color: #b33;
-}
-.error a {
-    color: #f75;
-}
-      </style>
+      .warning {
+        margin-top: 1em;
+        color: #aa8d3b;
+        font-style: italic;
+        font-weight: bold;
+      }
+      .error {
+        margin-top: 1em;
+        font-weight: bold;
+        color: #b33;
+      }
+      .error a {
+        color: #f75;
+      }
+    </style>
 
-       <style>
+    <style>
       body {
         color: #777;
-        width: 240px;
         padding-top: 5px;
         padding-bottom: 5px;
         padding-left: 10px;
@@ -91,30 +91,164 @@ p { word-wrap: break-word; }
         font-size: 12px;
         color: #878787;
       }
+      #webContent {
+        display: inline-block;
+        width: 100%;
+        min-height: 110px;
+      }
+
+      #avtar-block {
+        display: inline-block;
+        max-width: 100%;
+      }
+
+      #avtar {
+        max-width: 100%;
+      }
+      #ssl-info h1 {
+        color: #000;
+        margin-bottom: 30px;
+      }
+      #ssl-info p span {
+        padding: 10px 20px;
+      }
+
+      #ssl-issue-to, #ssl-issuer {
+        display: none;
+      }
+
+      #ssl-issue-to  ul, #ssl-issuer ul {
+        padding-left: 0;
+        margin: 0;
+        list-style: none;
+      }
+
+      .issuer-to, .issuer-by {
+        display: inline-block;
+        width: 100%;
+        margin-top: 20px;
+      }
+      .issuer-to ul, .issuer-by ul {
+        display: inline-block;
+        width: 100%;
+        padding-left: 0;
+        margin: 0;
+      }
+      .issuer-to ul li, .issuer-by ul li{
+        display: inline-block;
+        width: 100%;
+        list-style: none;
+        line-height: 14px;
+      }
+      .issuer-to ul li span:nth-child(1), .issuer-by ul li span:nth-child(1) {
+        float: left;
+        width: 40%;
+        line-height: 14px;
+      }
+      .issuer-to ul li span:nth-child(2), .issuer-by ul li span:nth-child(2) {
+        float: right;
+        width: 60%;
+        line-height: 14px;
+      }
+
+      #ssl-message {
+        margin-top: 20px;
+      }
+      #submit-block {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+      }
+      button {
+        border: none;
+        border-radius: 5px;
+        font-size: 15px;
+        text-transform: capitalize;
+        padding: 10px 30px;
+        margin-top: 20px;
+        background-color: rgb(33, 150, 243);
+        color: #fff;
+        box-shadow: 0px 5px 12px -1px #000;
+      }
+      .eko-icon-parent {
+        display: inline-block;
+        width: 100%;
+        text-align: center;
+      }
+      .capture-cred button {
+        margin-top: 0;
+      }
+
+      #success-msg {
+        color: #690;
+      }
+
+      #failure-msg {
+        color: #f75;
+      }
     </style>
   </head>
   <body>
       <div id="open-wrap">
-        <img src="eko-icon.png"/>
-        <button class="btn btn-primary" id="confirmation-button">Capture credentials</button>
+        <div class="eko-icon-parent">
+          <img src="eko-icon.png"/>
+        </div>
+        <div class="capture-cred">
+          <button class="btn btn-primary" id="confirmation-button">Capture credentials</button>
+        </div>
       </div>
 
       <div id="wrap">
-        <button id="submit_form"> submit </button>
-        <p><span id="lblValidationResult" class="title-box">No HTTP(S) page loaded</span></p>
-        <p id="lblSubjectOrganization"><b></b>
-        </p>
-        <p id="pIssuer" style="display: none;">
-          <span>Issuer:</span><br />
-          <span id="lblIssuerOrganization"><b></b></span><br />
-          <span id="lblIssuerCommonName" class="text-small"></span><br />
-        </p>
-        <p><span id="lblMessage">Certificate information will display here when you open an HTTPS page.</span></p>
+        <div id="ssl-info">
+          <h2>SSL Info</h2>
+          <div>
+            <p>
+              <span id="ssl-validation-result" class="title-box">
+                No HTTP(S) page loaded
+              </span>
+            </p>
+          </div>
 
 
-        <img id="avtar" src=""></img>
+          <div id="ssl-issue-to">
+            <div class="issuer-to">
+              <p><b>Issuer To:</b></p>
+              <ul>
+                <li id="ssl-subject-organization">
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div id="ssl-issuer">
+            <div class="issuer-by">
+              <p><b>Issuer By:</b></p>
+              <ul>
+                <li id="ssl-issuer-organization">
+                </li>
+                <li id="ssl-issuer-commonName">
+                </li>
+              </ul>
+            </div>
+          </div>
 
-        <textarea id="webContent"></textarea>
+          <p id="ssl-message">
+            Certificate information will display here when you open an HTTPS page.
+          </p>
+        </div>
+
+        <div id="web-content-block">
+          <h2>Web Content</h2>
+          <textarea id="webContent">loding ...</textarea>
+        </div>
+
+        <div id="avtar-block">
+          <h2>Avtar</h2>
+          <img id="avtar" src=""></img>
+        </div>
+
+        <div id="submit-block">
+          <button id="submit_form"> submit </button>
+        </div>
 
         <div id="loading">
             <div class="loader"><div class="bar" id="bar"></div></div>
@@ -138,6 +272,7 @@ p { word-wrap: break-word; }
             another page on the web.
         </div>
         <div id="uh-oh" class="error">
+            <div id="response-error"></div>
             Uh oh, something went wrong! Try reloading the page,
             verifying javascript is enabled,
             and running this again.
@@ -149,6 +284,13 @@ p { word-wrap: break-word; }
         </div>
       </div>
 
+      <div id="success-msg">
+        Your credentials are saved successfully!!
+      </div>
+
+      <div id="failure-msg">
+        Something went wrong :(
+      </div>
       <!-- JavaScript and HTML must be in separate files for security. -->
       <script src="api.js"></script>
       <script src="popup.js"></script>

@@ -27,7 +27,7 @@ function getFilename(contentURL) {
             .replace(/[_\-]+$/, '');
         name = '-' + name;
     } else {
-        name = '';
+      name = '';
     }
     return 'screencapture' + name + '-' + Date.now() + '.png';
 }
@@ -39,63 +39,44 @@ function getFilename(contentURL) {
 
 
 function displayCaptures(filenames) {
-    if (!filenames || !filenames.length) {
-        show('uh-oh');
-        return;
-    }
+  if (!filenames || !filenames.length) {
+    errorHandler('File cannot capture');
+    return;
+  }
 
-    _displayCapture(filenames);
+  _displayCapture(filenames);
 }
 
 
 function _displayCapture(filenames, index) {
-    index = index || 0;
+  index = index || 0;
+  var filename = filenames[index];
+  var last = index === filenames.length - 1;
 
-    var filename = filenames[index];
-    var last = index === filenames.length - 1;
+  const file = filename.replace('filesystem:','');
+  show('avtar-block');
+  hide('loading');
+  $("avtar").src = file;
+  toDataURL(filename, function(dataUrl) {
+    credentialFile = dataURLtoFile(dataUrl, filename);
+    var image = $("avtar");
+    image.src = credentialFile.name;
 
-    if (currentTab.incognito && index === 0) {
-        // cannot access file system in incognito, so open in non-incognito
-        // window and add any additional tabs to that window.
-        //
-        // we have to be careful with focused too, because that will close
-        // the popup.
-        chrome.windows.create({
-            url: filename,
-            incognito: false,
-            focused: last
-        }, function(win) {
-            resultWindowId = win.id;
-        });
-    } else {
-        const file = filename.replace('filesystem:','');
-        $("avtar").src = file;
-        toDataURL(filename, function(dataUrl) {
-          credentialFile = dataURLtoFile(dataUrl, filename);
-          var image = $("avtar");
-          image.src = credentialFile.name;
+    canSave();
+  })
 
-          cansave();
-        })
-
-
-        // chrome.tabs.create({
-        //     url: filename,
-        // });
-    }
-
-    if (!last) {
-        _displayCapture(filenames, index + 1);
-    }
+  if (!last) {
+    _displayCapture(filenames, index + 1);
+  }
 }
 
 function dataURLtoFile(dataurl, filename) {
-    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-    while(n--){
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, {type:mime});
+  var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+  while(n--){
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, {type:mime});
 }
 
 
@@ -115,18 +96,21 @@ function toDataURL(url, callback) {
 
 
 function errorHandler(reason) {
-    show('uh-oh'); // TODO - extra uh-oh info?
+  hide('loading');
+  hide('web-content-block');
+  show('uh-oh'); // TODO - extra uh-oh info?
+  $('response-error').innerHTML = reason;
 }
 
 
 function progress(complete) {
-    if (complete === 0) {
-        // Page capture has just been initiated.
-        show('loading');
-    }
-    else {
-        $('bar').style.width = parseInt(complete * 100, 10) + '%';
-    }
+  if (complete === 0) {
+    // Page capture has just been initiated.
+    show('loading');
+  }
+  else {
+    $('bar').style.width = parseInt(complete * 100, 10) + '%';
+  }
 }
 
 function splitnotifier() {
@@ -146,11 +130,11 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       var filename = getFilename(tab.url);
       show('loading');
       hide('open-wrap');
-
+      show('web-content-block');
       exposeSSL();
       CaptureAPI.captureToFiles(tab, filename, displayCaptures,
                                 errorHandler, progress, splitnotifier);
-      setTimeout(function(){ getWebContent(tabs[0].id); }, 3000);
+      setTimeout(function(){ getWebContent(tabs[0].id); }, 500);
 
     });
   };
@@ -162,47 +146,51 @@ function exposeSSL() {
   var popupData = background.popupData[currentTabId];
   if (typeof popupData === 'undefined') return;
 
-  document.getElementById('lblValidationResult').style['background'] = popupData['result_color_hex'];
-  document.getElementById('lblValidationResult').innerHTML = popupData['validation_result'];
-  document.getElementById('lblMessage').innerHTML = popupData['message'];
+  show('ssl-info');
+  document.getElementById('ssl-validation-result').style['background'] = popupData['result_color_hex'];
+  document.getElementById('ssl-validation-result').innerHTML = popupData['validation_result'];
+  document.getElementById('ssl-message').innerHTML = popupData['message'];
 
   // Identity
   if (popupData["subject_organization"].length > 0) {
-    document.getElementById('lblSubjectOrganization').innerHTML = 'Organization:<br><b>' + popupData['subject_organization'] + '</b>';
-    document.getElementById('lblSubjectOrganization').style['display'] = 'block';
+    document.getElementById('ssl-issue-to').style['display'] = 'block';
+    document.getElementById('ssl-subject-organization').innerHTML = '<span>Organization</span><span>' + popupData['subject_organization'] +'</span>';
+    document.getElementById('ssl-subject-organization').style['display'] = 'block';
   } else {
-    document.getElementById('lblSubjectOrganization').innerHTML = '';
-    document.getElementById('lblSubjectOrganization').style['display'] = 'none';
+    document.getElementById('ssl-issue-to').style['display'] = 'none';
   }
 
   // Issuer
   if (popupData["issuer_common_name"].length > 0) {
-    document.getElementById('pIssuer').style['display'] = 'block';
-    document.getElementById('lblIssuerOrganization').innerHTML = '<b>' + popupData['issuer_organization'] + '</b>';
-    document.getElementById('lblIssuerCommonName').innerHTML = popupData['issuer_common_name'];
+    document.getElementById('ssl-issuer').style['display'] = 'block';
+    document.getElementById('ssl-issuer-organization').innerHTML = '<span>Organisation</span><span>' + popupData['issuer_organization'] + '</span>';
+    document.getElementById('ssl-issuer-commonName').innerHTML = '<span>Common Name</span><span>' + popupData['issuer_common_name'] + '</span>';
   } else {
-    document.getElementById('pIssuer').style['display'] = 'none';
+    document.getElementById('ssl-issuer').style['display'] = 'none';
   }
   sslInfo = JSON.stringify(popupData);
 
-  cansave();
+  canSave();
 };
 
 function getWebContent(tabId) {
   chrome.tabs.sendMessage(tabId, {msg: "webContent"}, function(response) {
     webContent = response;
     $('webContent').value = webContent;
-    cansave();
+    canSave();
   })
 }
 
-function cansave() {
+function canSave() {
   if(!sslInfo || !webContent || !credentialFile) {
     return;
   }
-
+  show('submit-block');
   document.getElementById("submit_form").addEventListener("click", function (e) {
     e.stopPropagation();
+
+    this.disabled = true;
+    this.innerHTML = 'Saving ...'
     saveCredential();
   });
 
@@ -219,9 +207,15 @@ function saveCredential() {
 
   request.onreadystatechange = function() {
     // Only handle event when request is finished
-    // if (request.readyState !== 4) {
-    //   return;
-    // }
+    if (request.readyState !== 4) {
+      return;
+    }
+    hide('wrap');
+    if (request.status == 200) {
+      show('success-msg');
+    } else {
+      show('failure-msg');
+    }
   };
   request.open("POST", "http://localhost:3000/v1/verify_credential");
   request.send(formData);

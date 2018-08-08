@@ -33,7 +33,6 @@ window.CaptureAPI = (function() {
 
 
     function initiateCapture(tab, callback) {
-        console.log('tab', tab)
         chrome.tabs.sendMessage(tab.id, {msg: 'scrollPage'}, function() {
             // We're done taking snapshots of all parts of the window. Display
             // the resulting full screenshot images in a new browser tab.
@@ -238,7 +237,8 @@ window.CaptureAPI = (function() {
         progress = progress || noop;
 
         if (!isValidUrl(tab.url)) {
-            errback('invalid url'); // TODO errors
+            errback('Invalid url'); // TODO errors
+            return;
         }
 
         // TODO will this stack up if run multiple times? (I think it will get cleared?)
