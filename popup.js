@@ -211,10 +211,16 @@ function saveCredential() {
       return;
     }
     hide('wrap');
-    if (request.status == 200) {
-      show('success-msg');
-    } else {
-      show('failure-msg');
+    switch(request.status) {
+      case 0:
+        show('failure-msg');
+        $('failure-msg').innerHTML = 'Server is not start';
+        break;
+      case 200:
+        show('success-msg');
+        break;
+      default:
+        show('failure-msg');
     }
   };
   request.open("POST", "http://localhost:3000/v1/verify_credential");
