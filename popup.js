@@ -9,7 +9,9 @@
 var currentTab, // result of chrome.tabs.query of current active tab
     resultWindowId; // window id for putting resulting images
 
-var sslInfo, webContent, credentialFile;
+var userName, sslInfo, webContent, credentialFile;
+var hostname = env.TYPE == 'development' ? 'localhost:3000' : '13.59.170.145:3000';
+var apiUrl = 'http://' + hostname;
 
 function $(id) { return document.getElementById(id); }
 function show(id) { $(id).style.display = 'block'; }
@@ -123,7 +125,12 @@ function splitnotifier() {
 //
 
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-  $('open-wrap').onclick = function(element) {
+  $('confirmation-button').onclick = function(element) {
+    userName = $('user-name').value;
+    if (userName == "") {
+      $('user-name-error').innerHTML = "Enter your name";
+      return;
+    }
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
       var tab = tabs[0];
       currentTab = tab; // used in later calls to get tab info
@@ -201,9 +208,9 @@ function saveCredential() {
   var formData = new FormData();
   var request = new XMLHttpRequest();
   formData.append("avtar", credentialFile);
-
   formData.append("ssl_info", sslInfo);
   formData.append("web_content", webContent);
+  formData.append('user_name', userName);
 
   request.onreadystatechange = function() {
     // Only handle event when request is finished
@@ -223,7 +230,7 @@ function saveCredential() {
         show('failure-msg');
     }
   };
-  request.open("POST", "http://localhost:3000/v1/verify_credential");
+  request.open("POST", apiUrl + "/v1/verify_credential");
   request.send(formData);
 }
 
